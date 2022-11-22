@@ -20,7 +20,10 @@ Heating remote control for Elco/Ariston
 The Plant ID you can get from the URL, when logging into the WebGUI:
 https://www.remocon-net.remotethermo.com
 
-https://www.remocon-net.remotethermo.com/R2/Plant/Index/ _0A1BXXXXXXXX_ ?navMenuItem=0&breadcrumbPath=0
+```
+https://www.remocon-net.remotethermo.com/R2/Plant/Index/0A1BXXXXXXXX?navMenuItem=0&breadcrumbPath=0
+                                                        ^^^^^^^^^^^^
+```
 
 ## Changelog
 
