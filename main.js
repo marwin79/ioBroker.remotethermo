@@ -35,7 +35,7 @@ class Remotethermo extends utils.Adapter {
      */
     async onReady() {
         // Initialize your adapter here
-        await this.setStateAsync('info.connection', false, true);
+        await this.setStateAsync("info.connection", false, true);
 
         switch (this.config.service) {
             case "elco":
@@ -264,7 +264,7 @@ class Remotethermo extends utils.Adapter {
     //        },
     //        zoneData: {
     //          holidays: [],
-    //          mode: { 
+    //          mode: {
     //              allowedOptions: [ 0, 1, 2, 3 ],
     //              allowedOptionTexts: [ 'Protection', 'Automatic', 'Reduced', 'Comfort' ],
     //              value: 1
