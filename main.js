@@ -114,11 +114,13 @@ class Remotethermo extends utils.Adapter {
         // XXX
         // this.subscribeStates("*");
 
-        this.log.debug("Step 1");
+        let url = baseURL + "/R2/Account/Login";
+
+        this.log.debug("Step 1: " + url);
         try {
             const response = await this.requestClient({
                 method: "post",
-                url: baseURL + "/R2/Account/Login",
+                url: url,
                 //headers:
                 jar: this.cookieJar,
                 withCredentials: true,
@@ -154,14 +156,103 @@ class Remotethermo extends utils.Adapter {
         this.log.debug(JSON.stringify(this.cookieJar));
 
 
-        this.poll();
+        this.log.debug("Step 2");
+        //this.poll();
+        this.poll2();
 
         this.updateInterval = setInterval(async () => {
 
-            this.poll();
+            //this.poll();
 
         }, 1 * 60 * 1000);
 
+    }
+
+    async poll2() {
+
+        const data2 =
+            JSON.stringify({
+                useCache: true,
+                zone: 1,
+                filter: {
+                    progIds: null,
+                    plant: true,
+                    zone: true
+                }
+            });
+        try {
+            // XXX Get plant ID(s) and use in object tree
+            const response = await this.requestClient({
+                method: "get",
+                // https://www.remocon-net.remotethermo.com/R2/PlantMenuBsb/UserMenu/F0AD4E03EC5B
+                //url: baseURL + "/R2/PlantMenuBsb/UserMenu/" + plantId + "?navMenuItem=BsbUserMenu",
+                url: baseURL + "/R2/PlantMenuBsb/UserMenu/" + plantId,
+                //headers: {
+                //    "Content-Type": "application/json"
+                //},
+                jar: this.cookieJar,
+                withCredentials: true,
+                //data: data2
+            });
+            //this.log.debug(JSON.stringify(response.status));
+            //this.log.debug(JSON.stringify(response.statusText));
+            //this.log.debug(JSON.stringify(response.headers));
+            //this.log.debug(JSON.stringify(response.config));
+            //this.log.debug(JSON.stringify(response.data));
+
+            const myArray = /nodes: (.*),\r\n/g.exec(response.data);
+            //this.log.debug(myArray[1]);
+            const myData = JSON.parse(myArray[1]);
+            this.log.debug(JSON.stringify(myData[7]));
+            //await this.setStateAsync("info.connection", true, true);
+
+            //const plantData = response.data.data.plantData;
+            //this.setStateAsync(`${plantId}.plant.outsideTemp`, plantData.outsideTemp, true);
+            //this.setStateAsync(`${plantId}.plant.hasOutsideTempProbe`, plantData.hasOutsideTempProbe, true);
+            //this.setStateAsync(`${plantId}.plant.dhwComfortTemp`, plantData.dhwComfortTemp.value, true);
+            //this.setStateAsync(`${plantId}.plant.dhwReducedTemp`, plantData.dhwReducedTemp.value, true);
+            //this.setStateAsync(`${plantId}.plant.dhwEnabled`, plantData.dhwEnabled, true);
+            //this.setStateAsync(`${plantId}.plant.dhwMode`, plantData.dhwMode.value, true);
+            //this.setStateAsync(`${plantId}.plant.flameSensor`, plantData.flameSensor, true);
+            //this.setStateAsync(`${plantId}.plant.heatPumpOn`, plantData.heatPumpOn, true);
+            //this.setStateAsync(`${plantId}.plant.dhwStorageTemp`, plantData.dhwStorageTemp, true);
+            //this.setStateAsync(`${plantId}.plant.dhwStorageTempError`, plantData.dhwStorageTempError, true);
+            //this.setStateAsync(`${plantId}.plant.hasDhwStorageProbe`, plantData.hasDhwStorageProbe, true);
+            //this.setStateAsync(`${plantId}.plant.outsideTempError`, plantData.outsideTempError, true);
+            //this.setStateAsync(`${plantId}.plant.isDhwProgReadOnly`, plantData.isDhwProgReadOnly, true);
+
+            //const zoneData = response.data.data.zoneData;
+            //this.setStateAsync(`${plantId}.zone.mode`, zoneData.mode.value, true);
+            //this.setStateAsync(`${plantId}.zone.isHeatingActive`, zoneData.isHeatingActive, true);
+            //this.setStateAsync(`${plantId}.zone.isCoolingActive`, zoneData.isCoolingActive, true);
+            //this.setStateAsync(`${plantId}.zone.hasRoomSensor`, zoneData.hasRoomSensor, true);
+            //this.setStateAsync(`${plantId}.zone.chComfortTemp`, zoneData.chComfortTemp.value, true);
+            //this.setStateAsync(`${plantId}.zone.chReducedTemp`, zoneData.chReducedTemp.value, true);
+            //this.setStateAsync(`${plantId}.zone.coolComfortTemp`, zoneData.coolComfortTemp.value, true);
+            //this.setStateAsync(`${plantId}.zone.coolReducedTemp`, zoneData.coolReducedTemp.value, true);
+            //this.setStateAsync(`${plantId}.zone.roomTemp`, zoneData.roomTemp, true);
+            //this.setStateAsync(`${plantId}.zone.heatOrCoolRequest`, zoneData.heatOrCoolRequest, true);
+            //this.setStateAsync(`${plantId}.zone.chProtectionTemp`, zoneData.chProtectionTemp, true);
+            //this.setStateAsync(`${plantId}.zone.coolProtectionTemp`, zoneData.coolProtectionTemp, true);
+            //this.setStateAsync(`${plantId}.zone.chHolidayTemp`, zoneData.chHolidayTemp, true);
+            //this.setStateAsync(`${plantId}.zone.coolHolidayTemp`, zoneData.coolHolidayTemp, true);
+            //this.setStateAsync(`${plantId}.zone.desiredRoomTemp`, zoneData.desiredRoomTemp, true);
+            //this.setStateAsync(`${plantId}.zone.useReducedOperationModeOnHoliday`, zoneData.useReducedOperationModeOnHoliday, true);
+            //this.setStateAsync(`${plantId}.zone.roomTempError`, zoneData.roomTempError, true);
+
+            return true;
+
+        } catch (error) {
+            this.log.error("Login error.");
+
+            if (typeof error === "string") {
+                this.log.error(error);
+            } else if (error instanceof Error) {
+                this.log.error(error.message);
+            }
+            await this.setStateAsync("info.connection", false, true);
+            return false;
+        }
     }
 
     async poll() {
