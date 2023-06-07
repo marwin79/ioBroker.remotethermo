@@ -155,8 +155,6 @@ class Remotethermo extends utils.Adapter {
         this.log.debug("CookieJar:");
         this.log.debug(JSON.stringify(this.cookieJar));
 
-
-        this.log.debug("Step 2");
         //this.poll();
         this.poll2();
 
@@ -182,11 +180,13 @@ class Remotethermo extends utils.Adapter {
             });
         try {
             // XXX Get plant ID(s) and use in object tree
+            let url = baseURL + "/R2/PlantMenuBsb/UserMenu/" + plantId;
+            this.log.debug("Step2: " + url);
             const response = await this.requestClient({
                 method: "get",
                 // https://www.remocon-net.remotethermo.com/R2/PlantMenuBsb/UserMenu/F0AD4E03EC5B
                 //url: baseURL + "/R2/PlantMenuBsb/UserMenu/" + plantId + "?navMenuItem=BsbUserMenu",
-                url: baseURL + "/R2/PlantMenuBsb/UserMenu/" + plantId,
+                url: url,
                 //headers: {
                 //    "Content-Type": "application/json"
                 //},
@@ -194,11 +194,10 @@ class Remotethermo extends utils.Adapter {
                 withCredentials: true,
                 //data: data2
             });
-            //this.log.debug(JSON.stringify(response.status));
-            //this.log.debug(JSON.stringify(response.statusText));
-            //this.log.debug(JSON.stringify(response.headers));
-            //this.log.debug(JSON.stringify(response.config));
-            //this.log.debug(JSON.stringify(response.data));
+            this.log.debug(JSON.stringify(response.status));
+            this.log.debug(JSON.stringify(response.statusText));
+            this.log.debug(JSON.stringify(response.headers));
+            this.log.debug(JSON.stringify(response.data));
 
             const myArray = /nodes: (.*),\r\n/g.exec(response.data);
             //this.log.debug(myArray[1]);
@@ -248,6 +247,7 @@ class Remotethermo extends utils.Adapter {
             if (typeof error === "string") {
                 this.log.error(error);
             } else if (error instanceof Error) {
+                this.log.error(error.name);
                 this.log.error(error.message);
             }
             await this.setStateAsync("info.connection", false, true);
